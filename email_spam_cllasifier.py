@@ -1,18 +1,16 @@
 import streamlit as st
 import joblib
 
-
 # CSS for background image
 page_bg_img = '''
 <style>
 body {
-    background-image: url("./email_bg.jpg");
+    background-image: url("email_bg.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
-
 .stApp {
     background: transparent !important;
 }
@@ -24,29 +22,26 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 st.title("Email Spam Classifier")
 st.write("Enter your email text below and check whether it is spam or not.")
 
-# User input
-user_input = st.text_area("Enter email text here:")
-
-# Load model and vectorizer
+# Load vectorizer and model
 vectorizer = joblib.load("vectorizer.pkl")
 model = joblib.load("naive_bayes_model.pkl")
 
+# User input
+user_input = st.text_area("Enter email text here:")
 
-# Button for prediction
+# Prediction logic
 if st.button("Check Spam/Ham"):
     if user_input.strip() == "":
         st.warning("Please enter some email text.")
     else:
-        # Transform input text to vector
-        user_vec = vectorizer.transform([user_input])
+        user_vector = vectorizer.transform([user_input])
+        prediction = model.predict(user_vector)[0]
 
-        # Predict spam or ham
-        prediction = model.predict(user_vec)[0]
-
-        if prediction == 1:
-            st.error("This email is **Spam**!")
+        # Make sure: 0 = Spam, 1 = Ham
+        if prediction == 0:
+            st.error("⚠️ This email is **Spam(Be carefull)**!")
         else:
-            st.success("This email is **Ham (Not Spam)**.")
+            st.success("✅ This email is **Ham **.")
 
 # Footer
 st.markdown("<br><hr><center>Developed by Yasir</center>", unsafe_allow_html=True)
